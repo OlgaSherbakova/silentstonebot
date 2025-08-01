@@ -4,8 +4,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import os
 
-# Токен бота — уже вписан
-TOKEN = "8142905270:AAEK9RGFV1DZkrw7j-i3qFnimSKaw5XBIMc"
+TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -17,12 +16,22 @@ def load_tasks():
 
 TASKS = load_tasks()
 
-# Кнопка "Отправить след"
+# Кнопки
 reply_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-reply_kb.add(KeyboardButton("📩 Отправить след"))
+reply_kb.add(
+    KeyboardButton("📩 Отправить след"),
+    KeyboardButton("🔁 Дай другое задание")
+)
 
 @dp.message_handler(commands=["start"])
 async def welcome(message: types.Message):
+    await send_task(message)
+
+@dp.message_handler(lambda m: m.text == "🔁 Дай другое задание")
+async def another_task(message: types.Message):
+    await send_task(message)
+
+async def send_task(message):
     task = random.choice(TASKS)
     text = (
         "Привет. Я рад тебя видеть.\n\n"
