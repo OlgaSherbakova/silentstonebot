@@ -142,17 +142,21 @@ async def receive_trace(message: types.Message):
             await bot.send_photo(CHANNEL_ID, message.photo[-1].file_id, caption="📸 След (фото)")
         elif message.voice:
             await bot.send_voice(CHANNEL_ID, message.voice.file_id, caption="🎤 След (голос)")
-        elif message.audio:
-            await bot.send_audio(CHANNEL_ID, message.audio.file_id, caption="🎵 След (аудио)")
         elif message.video:
             await bot.send_video(CHANNEL_ID, message.video.file_id, caption="🎬 След (видео)")
+        elif message.video_note:
+            await bot.send_video_note(CHANNEL_ID, message.video_note.file_id)
+        elif message.sticker:
+            await bot.send_sticker(CHANNEL_ID, message.sticker.file_id)
+        elif message.audio:
+            await bot.send_audio(CHANNEL_ID, message.audio.file_id, caption="🎵 След (аудио)")
         elif message.document:
             await bot.send_document(CHANNEL_ID, message.document.file_id, caption="📎 След (файл)")
-
         else:
             await bot.send_message(CHANNEL_ID, "📦 След получен (неопознанный тип)")
     except Exception as e:
         print("Ошибка при отправке в канал:", e)
+
 
 async def main():
     await dp.start_polling()
