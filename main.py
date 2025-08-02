@@ -64,6 +64,7 @@ async def start(message: types.Message):
 
 Это пространство — открытое. 
 Можно делать как хочешь. Ради действия. Ради игры. Ради того, чтобы просто попробовать."""
+    
     await message.answer(greeting, reply_markup=reply_kb)
 
     if last_date == today:
@@ -71,7 +72,13 @@ async def start(message: types.Message):
     else:
         await send_task(message)
         user_last_task_date[user_id] = today
-        await message.answer("📡 Следы появляются в канале:\nhttps://t.me/mysilentchannel", reply_markup=reply_kb)
+
+        # 🔘 Кнопка со ссылкой на канал
+        channel_button = InlineKeyboardMarkup().add(
+            InlineKeyboardButton("📡 Перейти в канал", url="https://t.me/mysilentchannel")
+        )
+        await message.answer("📡 Следы появляются в канале:", reply_markup=channel_button)
+
 
 @dp.message_handler(lambda m: m.text == "🔁 Дай другое задание")
 async def another_task(message: types.Message):
@@ -129,9 +136,7 @@ async def receive_trace(message: types.Message):
                 print("⚠️ Короткий мат — не публикуется")
                 return
 
-            await bot.send_message(CHANNEL_ID, f"📝 След от пользователя:
-
-{content}")
+            await bot.send_message(CHANNEL_ID, f"📝 След от пользователя:\n\n{content}")
 
         elif message.photo:
             await bot.send_photo(CHANNEL_ID, message.photo[-1].file_id, caption="📸 След (фото)")
