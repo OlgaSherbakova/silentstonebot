@@ -71,8 +71,7 @@ async def start(message: types.Message):
     else:
         await send_task(message)
         user_last_task_date[user_id] = today
-        await message.answer("📡 Следы появляются в канале:
-https://t.me/mysilentchannel", reply_markup=reply_kb)
+        await message.answer("📡 Следы появляются в канале:\nhttps://t.me/mysilentchannel", reply_markup=reply_kb)
 
 @dp.message_handler(lambda m: m.text == "🔁 Дай другое задание")
 async def another_task(message: types.Message):
