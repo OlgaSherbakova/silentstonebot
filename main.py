@@ -51,7 +51,7 @@ async def start(message: types.Message):
     today = datetime.date.today()
     last_date = user_last_task_date.get(user_id)
 
-    greeting = (
+    greeting = """
         "Привет. Я рад тебя видеть.
 
 "
@@ -76,7 +76,7 @@ async def start(message: types.Message):
 "
         "Можно делать как хочешь. Ради действия. Ради игры. Ради того, чтобы просто попробовать."
     )
-    await message.answer(greeting, reply_markup=reply_kb)
+    await message.answer(greeting, reply_markup=reply_kb
 
     if last_date == today:
         await message.answer("🕒 Сегодня ты уже получал задание. Приходи завтра.", reply_markup=reply_kb)
