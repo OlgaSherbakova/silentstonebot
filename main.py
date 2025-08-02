@@ -102,9 +102,7 @@ async def send_task(message):
     history.add(task_index)
     user_task_history[user_id] = history
 
-    await message.answer(f"*{task['title']}*
-
-{task['description']}", parse_mode="Markdown", reply_markup=reply_kb)
+    await message.answer(f"*{task['title']}*\n\n{task['description']}", parse_mode="Markdown", reply_markup=reply_kb)
 
 @dp.message_handler(lambda m: m.text == "📩 Отправить след")
 async def wait_for_response(message: types.Message):
