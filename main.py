@@ -1,3 +1,4 @@
+
 import random
 import asyncio
 import datetime
@@ -51,13 +52,29 @@ async def start(message: types.Message):
     last_date = user_last_task_date.get(user_id)
 
     greeting = (
-        "Привет. Я рад тебя видеть.\n\n"
-        "Мне кажется, каждый человек — это уже искусство.\n\n"
-        "Не знаю, считаешь ли ты себя искусством, \n"
-        "но если хочешь — ниже будет задание, которое выпало случайно.\n\n"
-        "Если хочешь — выполни.\n"
-        "Если не хочешь — можешь просто отправить свой след: текст, фото, звук, ничего.\n\n"
-        "Всё останется анонимным."
+        "Привет. Я рад тебя видеть.
+
+"
+        "Этот бот — про спонтанное творчество. Он даёт случайные задания: иногда простые, иногда странные, иногда почти ничего.
+
+"
+        "Всё остаётся анонимным. Здесь никто не проверяет, не оценивает, не ждёт результата.
+
+"
+        "Мне кажется, каждый человек — это уже искусство.
+
+"
+        "Не знаю, считаешь ли ты себя искусством, 
+"
+        "но если хочешь — ниже будет задание, которое выпало случайно.
+
+"
+        "Можно выполнить. Можно не выполнять. Можно просто отправить след: текст, фото, звук.
+
+"
+        "Это пространство — открытое. 
+"
+        "Можно делать как хочешь. Ради действия. Ради игры. Ради того, чтобы просто попробовать."
     )
     await message.answer(greeting, reply_markup=reply_kb)
 
@@ -66,7 +83,8 @@ async def start(message: types.Message):
     else:
         await send_task(message)
         user_last_task_date[user_id] = today
-        await message.answer(f"📡 Следы появляются в канале:\n{CHANNEL_LINK}", reply_markup=reply_kb)
+        await message.answer("📡 Следы появляются в канале:
+https://t.me/mysilentchannel", reply_markup=reply_kb)
 
 @dp.message_handler(lambda m: m.text == "🔁 Дай другое задание")
 async def another_task(message: types.Message):
@@ -83,13 +101,12 @@ async def send_task(message):
     tasks = load_tasks()
     total = len(tasks)
 
-    # Получаем историю пользователя
     history = user_task_history.get(user_id, set())
     available = [i for i in range(total) if i not in history]
 
     if not available:
         await message.answer("🎉 Ты прошёл все задания! Завтра можно будет начать заново.", reply_markup=reply_kb)
-        user_task_history[user_id] = set()  # сброс истории
+        user_task_history[user_id] = set()
         return
 
     task_index = random.choice(available)
@@ -98,7 +115,9 @@ async def send_task(message):
     history.add(task_index)
     user_task_history[user_id] = history
 
-    await message.answer(f"*{task['title']}*\n\n{task['description']}", parse_mode="Markdown", reply_markup=reply_kb)
+    await message.answer(f"*{task['title']}*
+
+{task['description']}", parse_mode="Markdown", reply_markup=reply_kb)
 
 @dp.message_handler(lambda m: m.text == "📩 Отправить след")
 async def wait_for_response(message: types.Message):
@@ -125,7 +144,9 @@ async def receive_trace(message: types.Message):
                 print("⚠️ Короткий мат — не публикуется")
                 return
 
-            await bot.send_message(CHANNEL_ID, f"📝 След от пользователя:\n\n{content}")
+            await bot.send_message(CHANNEL_ID, f"📝 След от пользователя:
+
+{content}")
 
         elif message.photo:
             await bot.send_photo(CHANNEL_ID, message.photo[-1].file_id, caption="📸 След (фото)")
