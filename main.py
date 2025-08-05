@@ -1,17 +1,14 @@
-import os
-import requests
-import json
+
+import random
 import asyncio
+import datetime
+import json
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-from aiohttp import web
 
 # Настройки
 TOKEN = "8142905270:AAEK9RGFV1DZkrw7j-i3qFnimSKaw5XBIMc"
 CHANNEL_ID = "@mysilentchannel"
-WEBHOOK_HOST = 'https://<your-app-name>.railway.app'  # Замените на URL вашего приложения на Railway
-WEBHOOK_PATH = '/webhook'  # Путь, на который Telegram будет отправлять обновления
-WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -46,11 +43,6 @@ JUNK_WORDS = [
     "ещё раз", "next", "again", "задание", "ещё!", "ещё.", "ещё?", "ещё)"
 ]
 
-# Функция для установки вебхука
-async def set_webhook():
-    await bot.set_webhook(WEBHOOK_URL)
-
-# Обработчик для /start
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
     user_id = message.from_user.id
@@ -72,7 +64,7 @@ async def start(message: types.Message):
 
 Это пространство — открытое. 
 Можно делать как хочешь. Ради действия. Ради игры. Ради того, чтобы просто попробовать."""
-
+    
     await message.answer(greeting, reply_markup=reply_kb)
 
     if last_date == today:
@@ -87,7 +79,7 @@ async def start(message: types.Message):
         )
         await message.answer("📡 Следы появляются в канале:", reply_markup=channel_button)
 
-# Обработчик для нового задания
+
 @dp.message_handler(lambda m: m.text == "🔁 Дай другое задание")
 async def another_task(message: types.Message):
     user_id = message.from_user.id
@@ -98,7 +90,6 @@ async def another_task(message: types.Message):
         await send_task(message)
         user_last_task_date[user_id] = today
 
-# Функция для отправки задания
 async def send_task(message):
     user_id = message.from_user.id
     tasks = load_tasks()
@@ -120,12 +111,10 @@ async def send_task(message):
 
     await message.answer(f"*{task['title']}*\n\n{task['description']}", parse_mode="Markdown", reply_markup=reply_kb)
 
-# Обработчик для отправки следа
 @dp.message_handler(lambda m: m.text == "📩 Отправить след")
 async def wait_for_response(message: types.Message):
     await message.answer("Жду твой след. Можешь отправить фото, текст или звук.", reply_markup=reply_kb)
 
-# Обработчик для получения следов
 @dp.message_handler(content_types=types.ContentType.ANY)
 async def receive_trace(message: types.Message):
     await message.answer("Спасибо. След получен. Возвращайся, когда захочешь новое задание 🌿", reply_markup=reply_kb)
@@ -163,27 +152,14 @@ async def receive_trace(message: types.Message):
             await bot.send_audio(CHANNEL_ID, message.audio.file_id, caption="🎵 След (аудио)")
         elif message.document:
             await bot.send_document(CHANNEL_ID, message.document.file_id, caption="📎 След (файл)")
-
+        else:
+            await bot.send_message(CHANNEL_ID, "📦 След получен (неопознанный тип)")
     except Exception as e:
         print("Ошибка при отправке в канал:", e)
 
-# Обработчик для вебхуков
-async def on_webhook(request):
-    json_str = await request.json()
-    update = types.Update.parse_obj(json_str)
-    await dp.process_update(update)
-    return web.Response(text="OK")
 
-# Основная функция для старта
 async def main():
-    # Устанавливаем вебхук
-    await set_webhook()
-
-    # Настроим веб-сервер для получения обновлений
-    app = web.Application()
-    app.router.add_post(WEBHOOK_PATH, on_webhook)
-    app.router.add_get('/', lambda request: web.Response(text="Bot is working"))  # Просто тестовый эндпоинт
-    web.run_app(app, host="0.0.0.0", port=8080)
+    await dp.start_polling()
 
 if __name__ == "__main__":
     asyncio.run(main())
