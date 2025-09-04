@@ -1,2 +1,5 @@
+--only-binary=:all:
 aiogram==2.25.2
 aiohttp==3.8.6
+yarl==1.9.4
+multidict==6.0.4
